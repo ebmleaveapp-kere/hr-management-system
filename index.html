@@ -1495,11 +1495,20 @@
             document.getElementById('remainingBalance').value = '';
         });
 
-        // ============ FIXED AUTHENTICATION - LOAD CONFIG FIRST ============
+        // ============ FIXED AUTHENTICATION ============
+        let isInitializing = true;
+
         async function initializeApp() {
+            // Disable login button while initializing
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Initializing...';
+            
             const configLoaded = await loadConfig();
             if (!configLoaded || !CONFIG) {
                 console.error('Failed to load config');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign in with Google';
                 return;
             }
             
@@ -1529,20 +1538,26 @@
                         }
                     }
                 });
+                
+                // Re-enable login button after initialization
+                isInitializing = false;
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign in with Google';
             });
         }
 
-        document.getElementById('loginBtn')?.addEventListener('click', () => {
+               document.getElementById('loginBtn')?.addEventListener('click', () => {
+            // Don't allow clicking if still initializing
+            if (isInitializing) {
+                document.getElementById('errorMessage').innerText = 'Still initializing, please wait...';
+                return;
+            }
+            
             if (!checkRateLimit()) return;
             if (tokenClient) {
                 tokenClient.requestAccessToken();
             } else {
-                document.getElementById('errorMessage').innerText = 'Initializing, please wait and try again...';
-                setTimeout(() => {
-                    if (tokenClient) {
-                        if (checkRateLimit()) tokenClient.requestAccessToken();
-                    }
-                }, 1000);
+                document.getElementById('errorMessage').innerText = 'Not initialized. Please refresh the page.';
             }
         });
 
@@ -1555,6 +1570,9 @@
 
         // Start the app
         initializeApp();
+
+
+        
     </script>
 </body>
 </html>
