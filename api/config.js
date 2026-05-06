@@ -1,4 +1,3 @@
-// api/config.js
 export default async function handler(req, res) {
   const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
   const API_KEY = process.env.GOOGLE_API_KEY;
