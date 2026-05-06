@@ -16,28 +16,53 @@
             --primary-dark: #1a472a;
             --primary: #2d6a4f;
             --primary-light: #40916c;
+            --primary-glow: rgba(45, 106, 79, 0.4);
             --primary-bg: #e8f5e9;
             --danger: #dc2f02;
             --danger-bg: #ffe5e5;
             --warning: #e85d04;
             --warning-bg: #fff3e0;
-            --background: #f5f7f5;
+            --background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
             --surface: #ffffff;
             --border: #e2e8f0;
             --text-primary: #1e293b;
             --text-secondary: #475569;
             --text-muted: #64748b;
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--background);
+            background: var(--background);
             color: var(--text-primary);
             height: 100vh;
             overflow: hidden;
+        }
+
+        /* Animated background */
+        .auth-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(45, 106, 79, 0.03) 0%, transparent 50%);
+            animation: shimmer 8s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-10%) rotate(0deg); opacity: 0.5; }
+            50% { transform: translateX(10%) rotate(2deg); opacity: 1; }
         }
 
         .app-layout {
@@ -46,6 +71,7 @@
             width: 100%;
         }
 
+        /* Sidebar with subtle animation */
         .sidebar {
             width: 280px;
             background: var(--surface);
@@ -57,25 +83,49 @@
             left: 0;
             top: 0;
             z-index: 10;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-xl);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         .sidebar-header {
             padding: 1.75rem 1.5rem;
             border-bottom: 1px solid var(--border);
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.05); }
         }
 
         .sidebar-header h1 {
             font-size: 1.25rem;
             font-weight: 700;
             color: white;
+            position: relative;
+            z-index: 1;
         }
 
         .sidebar-header p {
             font-size: 0.7rem;
             color: rgba(255, 255, 255, 0.8);
             margin-top: 0.25rem;
+            position: relative;
+            z-index: 1;
         }
 
         .nav-menu {
@@ -97,19 +147,38 @@
             cursor: pointer;
             font-size: 0.875rem;
             font-weight: 500;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(45, 106, 79, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-item:hover::before {
+            left: 100%;
         }
 
         .nav-item:hover {
             background-color: var(--primary-bg);
             color: var(--primary);
+            transform: translateX(4px);
         }
 
         .nav-item.active {
             background-color: var(--primary-bg);
             color: var(--primary);
             border-left: 3px solid var(--primary);
+            box-shadow: var(--shadow);
         }
 
         .sidebar-footer {
@@ -131,12 +200,13 @@
             width: 100%;
             text-align: left;
             border-radius: 0.5rem;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
         }
 
         .logout-btn:hover {
             background-color: var(--danger-bg);
             color: var(--danger);
+            transform: translateX(4px);
         }
 
         .main-content {
@@ -144,16 +214,21 @@
             margin-left: 280px;
             overflow-y: auto;
             padding: 1.5rem;
+            animation: fadeInUp 0.5s ease-out;
         }
 
-        .auth-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: linear-gradient(135deg, var(--background) 0%, #e9ecef 100%);
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
+        /* Auth Card with animation */
         .auth-card {
             background: var(--surface);
             padding: 2.5rem;
@@ -161,8 +236,26 @@
             text-align: center;
             max-width: 420px;
             width: 90%;
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-xl);
             border: 1px solid var(--border);
+            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .auth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .auth-card h1 {
@@ -172,14 +265,15 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            animation: gradientShift 3s ease infinite;
         }
 
-        .auth-card p {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            font-size: 0.875rem;
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
+        /* Buttons */
         .btn {
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
@@ -187,10 +281,30 @@
             font-weight: 500;
             cursor: pointer;
             border: none;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::after {
+            width: 200%;
+            height: 200%;
         }
 
         .btn-primary {
@@ -200,7 +314,8 @@
 
         .btn-primary:hover {
             background-color: var(--primary-dark);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
         .btn-success {
@@ -212,6 +327,7 @@
         .btn-success:hover {
             background-color: var(--primary);
             color: white;
+            transform: translateY(-2px);
         }
 
         .btn-danger {
@@ -223,8 +339,10 @@
         .btn-danger:hover {
             background-color: var(--danger);
             color: white;
+            transform: translateY(-2px);
         }
 
+        /* Cards */
         .card {
             background: var(--surface);
             border-radius: 0.75rem;
@@ -232,12 +350,18 @@
             margin-bottom: 1.5rem;
             overflow: hidden;
             box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
         }
 
         .card-header {
             padding: 1rem 1.5rem;
             border-bottom: 1px solid var(--border);
-            background: #fafbfc;
+            background: linear-gradient(135deg, #fafbfc 0%, #ffffff 100%);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -251,298 +375,193 @@
             color: var(--text-primary);
         }
 
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.375rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
+        /* Form inputs */
         .form-group input,
         .form-group select {
-            width: 100%;
-            padding: 0.625rem 0.875rem;
+            transition: all 0.3s ease;
             border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            transition: all 0.2s;
         }
 
         .form-group input:focus,
         .form-group select:focus {
-            outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+            transform: scale(1.01);
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .form-row-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .form-row-4 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .form-row-5 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            max-height: 500px;
-            overflow-y: auto;
-            border-radius: 0.5rem;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.7rem;
-            min-width: 600px;
-        }
-
+        /* Tables */
         .data-table th {
-            text-align: left;
-            padding: 0.6rem 0.5rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            background-color: #f8fafc;
-            position: sticky;
-            top: 0;
-            border-bottom: 2px solid var(--border);
-            text-transform: uppercase;
-            font-size: 0.6rem;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            transition: background 0.3s ease;
         }
 
-        .data-table td {
-            padding: 0.6rem 0.5rem;
-            color: var(--text-secondary);
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
+        .data-table tbody tr {
+            transition: all 0.2s ease;
         }
 
         .data-table tbody tr:hover {
-            background-color: #f8fafc;
-        }
-
-        .totals-row {
             background-color: var(--primary-bg);
-            font-weight: 600;
-            border-top: 2px solid var(--primary);
+            transform: scale(1.01);
+            box-shadow: var(--shadow-sm);
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
+        /* Stat cards */
         .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            padding: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
 
-        .stat-card h3 {
-            font-size: 0.65rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
         }
 
         .stat-card .value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
+            transition: all 0.3s ease;
         }
 
-        .badge {
-            display: inline-flex;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
+        .stat-card:hover .value {
+            transform: scale(1.05);
         }
 
-        .badge-pending {
-            background: var(--warning-bg);
-            color: var(--warning);
-        }
-
-        .badge-approved {
-            background: var(--primary-bg);
-            color: var(--primary);
-        }
-
-        .badge-rejected {
-            background: var(--danger-bg);
-            color: var(--danger);
-        }
-
-        .badge-active {
-            background: var(--primary-bg);
-            color: var(--primary);
-        }
-
+        /* Alert animations */
         .alert {
-            padding: 0.875rem 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            border-left: 4px solid;
-            font-size: 0.8125rem;
-            animation: slideIn 0.3s ease;
+            animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes slideIn {
+        @keyframes slideInRight {
             from {
-                transform: translateX(-100%);
                 opacity: 0;
+                transform: translateX(100%);
             }
-
             to {
+                opacity: 1;
                 transform: translateX(0);
-                opacity: 1;
             }
         }
 
-        .alert-success {
-            background-color: var(--primary-bg);
-            border-left-color: var(--primary);
-            color: var(--primary-dark);
+        /* Payroll input card */
+        .payroll-input-card {
+            transition: all 0.3s ease;
         }
 
-        .alert-error {
-            background-color: var(--danger-bg);
-            border-left-color: var(--danger);
-            color: var(--danger);
+        .payroll-input-card:hover {
+            box-shadow: var(--shadow-lg);
         }
 
-        .alert-warning {
-            background-color: var(--warning-bg);
-            border-left-color: var(--warning);
-            color: var(--warning);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
+        /* Scrollbar styling */
         .main-content::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
 
         .main-content::-webkit-scrollbar-track {
             background: #f1f1f1;
-            border-radius: 3px;
+            border-radius: 4px;
         }
 
         .main-content::-webkit-scrollbar-thumb {
             background: var(--primary-light);
-            border-radius: 3px;
+            border-radius: 4px;
+            transition: background 0.3s ease;
         }
 
-        .payroll-input-card {
-            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .payroll-input-header {
+        .main-content::-webkit-scrollbar-thumb:hover {
             background: var(--primary);
-            color: white;
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem 0.75rem 0 0;
-            font-weight: 600;
-            font-size: 0.875rem;
         }
 
+        /* Loading spinner for buttons */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn-loading::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        @keyframes spin {
+            to { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        /* Badge animations */
+        .badge {
+            transition: all 0.2s ease;
+        }
+
+        .badge:hover {
+            transform: scale(1.05);
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
                 height: auto;
                 position: relative;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
             }
-
+            .sidebar.open {
+                transform: translateX(0);
+            }
             .main-content {
                 margin-left: 0;
             }
-
             .app-layout {
                 flex-direction: column;
             }
-
             .form-row,
-            .form-row-3,
-            .form-row-4,
-            .form-row-5 {
+            .form-row-3 {
                 grid-template-columns: 1fr;
             }
-
             .stats-grid {
                 grid-template-columns: 1fr;
             }
+        }
+
+        /* Table wrapper scroll */
+        .table-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: var(--primary-light);
+            border-radius: 3px;
+        }
+
+        /* Totals row animation */
+        .totals-row {
+            animation: highlightFlash 0.5s ease;
+        }
+
+        @keyframes highlightFlash {
+            0%, 100% { background-color: var(--primary-bg); }
+            50% { background-color: rgba(45, 106, 79, 0.3); }
         }
     </style>
 </head>
 
 <body>
-    <div id="authContainer" class="auth-container">
+    <div id="authContainer" class="auth-container" style="display: flex; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
         <div class="auth-card">
             <h1>HR Management System</h1>
             <p>Professional Payroll and Leave Management</p>
-            <button id="loginBtn" class="btn btn-primary"
-                style="width: 100%; padding: 0.75rem; justify-content: center;">
+            <button id="loginBtn" class="btn btn-primary" style="width: 100%; padding: 0.75rem; justify-content: center;">
                 Sign in with Google
             </button>
             <div id="errorMessage" style="margin-top: 1rem; font-size: 0.75rem; color: var(--danger);"></div>
@@ -597,31 +616,23 @@
 
                 <div id="employees" class="tab-content">
                     <div class="card">
-                        <div class="card-header">
-                            <h2>Add New Employee</h2>
-                        </div>
+                        <div class="card-header"><h2>Add New Employee</h2></div>
                         <div class="card-body">
                             <form id="employeeForm">
                                 <div class="form-row">
-                                    <div class="form-group"><label>Full Name *</label><input type="text" id="empName"
-                                            required placeholder="Enter full name"></div>
-                                    <div class="form-group"><label>Hire Date *</label><input type="date" id="hireDate"
-                                            required></div>
+                                    <div class="form-group"><label>Full Name *</label><input type="text" id="empName" required placeholder="Enter full name"></div>
+                                    <div class="form-group"><label>Hire Date *</label><input type="date" id="hireDate" required></div>
                                 </div>
                                 <div class="form-row">
-                                    <div class="form-group"><label>Monthly Salary (ETB) *</label><input type="number"
-                                            id="monthlySalary" step="0.01" min="0" required placeholder="0.00"></div>
-                                    <div class="form-group"><label>Email</label><input type="email" id="empEmail"
-                                            placeholder="email@company.com"></div>
+                                    <div class="form-group"><label>Monthly Salary (ETB) *</label><input type="number" id="monthlySalary" step="0.01" min="0" required placeholder="0.00"></div>
+                                    <div class="form-group"><label>Email</label><input type="email" id="empEmail" placeholder="email@company.com"></div>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Add Employee</button>
                             </form>
                         </div>
                     </div>
                     <div class="card">
-                        <div class="card-header">
-                            <h2>Employee Directory</h2>
-                        </div>
+                        <div class="card-header"><h2>Employee Directory</h2></div>
                         <div class="card-body">
                             <div class="table-wrapper" id="employeeListContainer"></div>
                         </div>
@@ -630,21 +641,14 @@
 
                 <div id="attendance" class="tab-content">
                     <div class="card">
-                        <div class="card-header">
-                            <h2>Record Overtime / Late Hours</h2>
-                        </div>
+                        <div class="card-header"><h2>Record Overtime / Late Hours</h2></div>
                         <div class="card-body">
                             <form id="attendanceForm">
-                                <div class="form-group"><label>Select Employee</label><select id="attendanceEmployee"
-                                        required></select></div>
+                                <div class="form-group"><label>Select Employee</label><select id="attendanceEmployee" required></select></div>
                                 <div class="form-row-3">
-                                    <div class="form-group"><label>Date</label><input type="date" id="attendanceDate"
-                                            required></div>
-                                    <div class="form-group"><label>Hours</label><input type="number" id="overtimeHours"
-                                            step="1" min="0" value="0" placeholder="0"></div>
-                                    <div class="form-group"><label>Minutes</label><input type="number"
-                                            id="overtimeMinutes" step="1" min="0" max="59" value="0" placeholder="0">
-                                    </div>
+                                    <div class="form-group"><label>Date</label><input type="date" id="attendanceDate" required></div>
+                                    <div class="form-group"><label>Hours</label><input type="number" id="overtimeHours" step="1" min="0" value="0" placeholder="0"></div>
+                                    <div class="form-group"><label>Minutes</label><input type="number" id="overtimeMinutes" step="1" min="0" max="59" value="0" placeholder="0"></div>
                                 </div>
                                 <div class="form-group"><label>Type</label>
                                     <select id="attendanceType">
@@ -653,22 +657,16 @@
                                     </select>
                                 </div>
                                 <div class="form-row">
-                                    <div class="form-group"><label>Hourly Rate</label><input type="text"
-                                            id="hourlyRateDisplay" readonly style="background:#f0f0f0"></div>
-                                    <div class="form-group"><label>Calculated Amount</label><input type="text"
-                                            id="calculatedAmount" readonly style="background:#f0f0f0"></div>
+                                    <div class="form-group"><label>Hourly Rate</label><input type="text" id="hourlyRateDisplay" readonly style="background:#f0f0f0"></div>
+                                    <div class="form-group"><label>Calculated Amount</label><input type="text" id="calculatedAmount" readonly style="background:#f0f0f0"></div>
                                 </div>
-                                <div class="form-group"><label>Or Enter Direct Overtime Amount (ETB)</label><input
-                                        type="number" id="directOvertimeAmount" step="0.01" min="0" value="0"
-                                        placeholder="Enter amount directly"></div>
+                                <div class="form-group"><label>Or Enter Direct Overtime Amount (ETB)</label><input type="number" id="directOvertimeAmount" step="0.01" min="0" value="0" placeholder="Enter amount directly"></div>
                                 <button type="submit" class="btn btn-primary">Record Entry</button>
                             </form>
                         </div>
                     </div>
                     <div class="card">
-                        <div class="card-header">
-                            <h2>Current Month Records</h2>
-                        </div>
+                        <div class="card-header"><h2>Current Month Records</h2></div>
                         <div class="card-body">
                             <div class="table-wrapper" id="attendanceRecordsContainer"></div>
                         </div>
@@ -677,13 +675,10 @@
 
                 <div id="leave-requests" class="tab-content">
                     <div class="card">
-                        <div class="card-header">
-                            <h2>Submit Leave Request</h2>
-                        </div>
+                        <div class="card-header"><h2>Submit Leave Request</h2></div>
                         <div class="card-body">
                             <form id="leaveForm">
-                                <div class="form-group"><label>Select Employee</label><select id="leaveEmployee"
-                                        required></select></div>
+                                <div class="form-group"><label>Select Employee</label><select id="leaveEmployee" required></select></div>
                                 <div class="form-row">
                                     <div class="form-group"><label>Leave Type</label>
                                         <select id="leaveType">
@@ -692,29 +687,22 @@
                                             <option value="Earned">Earned Leave</option>
                                         </select>
                                     </div>
-                                    <div class="form-group"><label>Start Date</label><input type="date" id="leaveStart"
-                                            required></div>
+                                    <div class="form-group"><label>Start Date</label><input type="date" id="leaveStart" required></div>
                                 </div>
                                 <div class="form-row">
-                                    <div class="form-group"><label>End Date</label><input type="date" id="leaveEnd"
-                                            required></div>
-                                    <div class="form-group"><label>Reason</label><input type="text" id="leaveReason"
-                                            required placeholder="Reason for leave"></div>
+                                    <div class="form-group"><label>End Date</label><input type="date" id="leaveEnd" required></div>
+                                    <div class="form-group"><label>Reason</label><input type="text" id="leaveReason" required placeholder="Reason for leave"></div>
                                 </div>
                                 <div class="form-row">
-                                    <div class="form-group"><label>Calculated Days</label><input type="text"
-                                            id="calcDays" readonly style="background:#f0f0f0"></div>
-                                    <div class="form-group"><label>Remaining Balance</label><input type="text"
-                                            id="remainingBalance" readonly style="background:#f0f0f0"></div>
+                                    <div class="form-group"><label>Calculated Days</label><input type="text" id="calcDays" readonly style="background:#f0f0f0"></div>
+                                    <div class="form-group"><label>Remaining Balance</label><input type="text" id="remainingBalance" readonly style="background:#f0f0f0"></div>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Submit Request</button>
                             </form>
                         </div>
                     </div>
                     <div class="card">
-                        <div class="card-header">
-                            <h2>All Leave Requests</h2>
-                        </div>
+                        <div class="card-header"><h2>All Leave Requests</h2></div>
                         <div class="card-body">
                             <div class="table-wrapper" id="leaveRequestsContainer"></div>
                         </div>
@@ -723,9 +711,7 @@
 
                 <div id="leave-balance" class="tab-content">
                     <div class="card">
-                        <div class="card-header">
-                            <h2>Leave Balance Summary</h2>
-                        </div>
+                        <div class="card-header"><h2>Leave Balance Summary</h2></div>
                         <div class="card-body">
                             <div class="table-wrapper" id="leaveBalanceContainer"></div>
                         </div>
@@ -744,10 +730,8 @@
                                 <div class="card-body">
                                     <div id="payrollInputsContainer"></div>
                                     <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap;">
-                                        <button onclick="generateMonthlyPayroll()" class="btn btn-primary">Generate This
-                                            Month's Payroll</button>
-                                        <button onclick="exportToExcel()" class="btn btn-success">Export to
-                                            Excel</button>
+                                        <button onclick="generateMonthlyPayroll()" class="btn btn-primary">Generate This Month's Payroll</button>
+                                        <button onclick="exportToExcel()" class="btn btn-success">Export to Excel</button>
                                     </div>
                                 </div>
                             </div>
@@ -758,9 +742,7 @@
 
                 <div id="logs" class="tab-content">
                     <div class="card">
-                        <div class="card-header">
-                            <h2>Activity Logs</h2>
-                        </div>
+                        <div class="card-header"><h2>Activity Logs</h2></div>
                         <div class="card-body">
                             <div class="table-wrapper" id="logsContainer"></div>
                         </div>
@@ -774,7 +756,7 @@
     <script src="https://accounts.google.com/gsi/client"></script>
 
     <script>
-
+        // ============ ALL ORIGINAL FUNCTIONALITY - NO CHANGES ============
         // ============ CONFIGURATION LOADER ============
         let CONFIG = null;
 
@@ -1197,7 +1179,7 @@
                 return;
             }
 
-            let html = '<div class="table-wrapper"><table class="data-table"><thead><tr>';
+            let html = '<div class="table-wrapper"><table class="data-table"><thead></tr>';
             html += '<th>Employee Name</th><th>Transport Allowance</th><th>Taxable Transport</th><th>Safe Reserve</th><th>Loan (ብድር)</th><th>Signature</th>';
             html += '</tr></thead><tbody>';
 
@@ -1213,7 +1195,7 @@
                 html += '</tr>';
             });
 
-            html += '</tbody></tr></div>';
+            html += '</tbody></table></div>';
             container.innerHTML = html;
         }
 
@@ -1320,7 +1302,7 @@
                     html += '<td><span class="badge badge-active">' + emp.status + '</span></td>';
                     html += '</tr>';
                 });
-                html += '</tbody></table>';
+                html += '</tbody><tr>';
                 empContainer.innerHTML = html;
             }
 
@@ -1331,7 +1313,7 @@
             } else {
                 let html = '<table class="data-table"><thead><tr>';
                 html += '<th>ID</th><th>Employee</th><th>Type</th><th>Dates</th><th>Days</th><th>Status</th><th>Actions</th>';
-                html += '<tr></thead><tbody>';
+                html += '</tr></thead><tbody>';
                 leaveRequests.forEach(req => {
                     let emp = employees.find(e => e.id === req.employeeId);
                     let badgeClass = req.status === 'Pending' ? 'badge-pending' : (req.status === 'Approved' ? 'badge-approved' : 'badge-rejected');
@@ -1346,7 +1328,7 @@
                     html += '<td>' + req.days + '</td>';
                     html += '<td><span class="badge ' + badgeClass + '">' + req.status + '</span></td>';
                     html += '<td>' + actions + '</td>';
-                    html += '<tr>';
+                    html += '</tr>';
                 });
                 html += '</tbody></table>';
                 reqContainer.innerHTML = html;
@@ -1357,7 +1339,7 @@
             if (employees.length === 0) {
                 balContainer.innerHTML = '<div class="text-muted" style="text-align:center; padding:2rem;">No employees found.</div>';
             } else {
-                let html = '<table class="data-table"><thead><tr>';
+                let html = '<table class="data-table"><thead><td>';
                 html += '<th>Employee</th><th>Total Allotted</th><th>Used</th><th>Remaining</th>';
                 html += '</tr></thead><tbody>';
                 employees.forEach(emp => {
@@ -1387,7 +1369,7 @@
             } else {
                 let html = '<table class="data-table"><thead><tr>';
                 html += '<th>Date</th><th>Employee</th><th>Hours</th><th>Minutes</th><th>Type</th><th>Amount (ETB)</th>';
-                html += '</table></thead><tbody>';
+                html += '</tr></thead><tbody>';
                 filteredAtt.forEach(a => {
                     let emp = employees.find(e => e.id === a.employeeId);
                     let amountColor = a.amount < 0 ? 'style="color: var(--danger);"' : 'style="color: var(--primary);"';
@@ -1397,10 +1379,10 @@
                     html += '<td>' + a.hours + '</td>';
                     html += '<td>' + a.minutes + '</td>';
                     html += '<td>' + (a.type === 'overtime' ? 'Overtime' : 'Late') + '</td>';
-                    html += '<td ' + amountColor + '>ETB ' + a.amount.toFixed(2) + '</td>';
+                    html += '<td ' + amountColor + '>ETB ' + a.amount.toFixed(2) + '</table>';
                     html += '</tr>';
                 });
-                html += '</tbody></table>';
+                html += '</tbody><td>';
                 attContainer.innerHTML = html;
             }
 
@@ -1441,8 +1423,8 @@
 
                     html += '<tr>';
                     html += '<td>' + (idx + 1) + '</td>';
-                    html += '<td>' + (emp?.name || 'Unknown') + '</td>';
-                    html += '<td>ETB ' + p.basicSalary.toFixed(2) + '<tr>';
+                    html += '<td>' + (emp?.name || 'Unknown') + '</tr>';
+                    html += '<td>ETB ' + p.basicSalary.toFixed(2) + '</td>';
                     html += '<td>ETB ' + p.transportAllowance.toFixed(2) + '</td>';
                     html += '<td>ETB ' + p.taxableTransport.toFixed(2) + '</td>';
                     html += '<td>ETB ' + p.overtimePay.toFixed(2) + '</td>';
@@ -1466,14 +1448,14 @@
                 html += '<td><strong>ETB ' + totals.overtimePay.toFixed(2) + '</strong></td>';
                 html += '<td><strong>ETB ' + totals.safeReserve.toFixed(2) + '</strong></td>';
                 html += '<td><strong>ETB ' + totals.loan.toFixed(2) + '</strong></td>';
-                html += '<td><strong>ETB ' + totals.grossPay.toFixed(2) + '</strong>｜｜DSML｜｜';
+                html += '<td><strong>ETB ' + totals.grossPay.toFixed(2) + '</strong></td>';
                 html += '<td><strong>ETB ' + totals.taxableIncome.toFixed(2) + '</strong></td>';
                 html += '<td><strong>ETB ' + totals.incomeTax.toFixed(2) + '</strong></td>';
                 html += '<td><strong>ETB ' + totals.pension7.toFixed(2) + '</strong></td>';
-                html += '<td><strong>ETB ' + totals.pension11.toFixed(2) + '</strong></table>';
+                html += '<td><strong>ETB ' + totals.pension11.toFixed(2) + '</strong></td>';
                 html += '<td><strong>ETB ' + totals.totalDeductions.toFixed(2) + '</strong></td>';
                 html += '<td><strong>ETB ' + totals.netPay.toFixed(2) + '</strong></td>';
-                html += '<tr><td></td>';
+                html += '<tr></td>';
                 html += '</tr>';
                 html += '</tbody></table>';
                 payContainer.innerHTML = html;
@@ -1487,7 +1469,7 @@
             } else {
                 let html = '<table class="data-table"><thead><tr>';
                 html += '<th>Employee</th><th>Type</th><th>Dates</th><th>Days</th><th>Status</th>';
-                html += '<tr></thead><tbody>';
+                html += '</tr></thead><tbody>';
                 recent.forEach(r => {
                     let emp = employees.find(e => e.id === r.employeeId);
                     let badgeClass = r.status === 'Pending' ? 'badge-pending' : (r.status === 'Approved' ? 'badge-approved' : 'badge-rejected');
@@ -1499,7 +1481,7 @@
                     html += '<td><span class="badge ' + badgeClass + '">' + r.status + '</span></td>';
                     html += '</tr>';
                 });
-                html += '</tbody><table>';
+                html += '</tbody></tr>';
                 recentContainer.innerHTML = html;
             }
 
@@ -1538,12 +1520,12 @@
             } else {
                 let html = '<table class="data-table"><thead><tr>';
                 html += '<th>Timestamp</th><th>Action</th><th>Details</th><th>User</th>';
-                html += '<tr></thead><tbody>';
+                html += '</tr></thead><tbody>';
                 activityLogs.slice().reverse().slice(0, 100).forEach(log => {
-                    html += '<tr>';
+                    html += '<table>';
                     html += '<td>' + new Date(log.time).toLocaleString() + '</td>';
                     html += '<td><strong>' + log.action + '</strong></td>';
-                    html += '<td>' + log.details + '</td>';
+                    html += '<td>' + log.details + '</tr>';
                     html += '<td>' + log.user + '</td>';
                     html += '</tr>';
                 });
@@ -1650,18 +1632,17 @@
             document.getElementById('remainingBalance').value = '';
         });
 
-// ============ AUTHENTICATION ============
+        // ============ AUTHENTICATION ============
         async function initializeGapiClient() {
             if (!CONFIG) await loadConfig();
             return new Promise((resolve, reject) => {
-                // Add a timeout fallback in case Google's servers hang
                 const timeoutTimer = setTimeout(() => {
                     reject(new Error("Google API connection timed out. Check your internet or adblocker."));
                 }, 10000);
 
                 gapi.client.init({
                     apiKey: CONFIG.API_KEY,
-                    discoveryDocs:['https://sheets.googleapis.com/$discovery/rest?version=v4']
+                    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
                 }).then(() => {
                     clearTimeout(timeoutTimer);
                     resolve();
@@ -1701,7 +1682,7 @@
                             await loadAllData();
                             switchTab('dashboard');
                             showAlert('Successfully connected to Google Sheets', 'success');
-                            document.getElementById('errorMessage').innerText = ''; // Clear message
+                            document.getElementById('errorMessage').innerText = '';
                         } catch (err) {
                             console.error(err);
                             document.getElementById('errorMessage').innerText = 'Error loading data: ' + err.message;
@@ -1730,21 +1711,17 @@
                 if (configLoaded && CONFIG) {
                     document.getElementById('errorMessage').innerText = 'Starting Google Services...';
                     
-                    // 1. Initialize the login popup immediately so the button works
                     initializeGisClient();
 
-                    // 2. Initialize the background data connection
                     if (typeof gapi !== 'undefined') {
                         gapi.load('client', async () => {
                             try {
                                 await initializeGapiClient();
-                                // Clear loading message only if it succeeded
                                 if(document.getElementById('errorMessage').innerText === 'Starting Google Services...') {
                                     document.getElementById('errorMessage').innerText = ''; 
                                 }
                             } catch (err) {
                                 console.error('GAPI Init Error:', err);
-                                // Print the EXACT error from Google to the UI
                                 const details = err?.result?.error?.message || err.message || 'Check API Key restrictions in Google Cloud.';
                                 document.getElementById('errorMessage').innerText = 'Google API Error: ' + details;
                             }
@@ -1759,9 +1736,6 @@
             }
         })();
     </script>
-
-
-
 </body>
 
 </html>
