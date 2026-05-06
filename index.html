@@ -1495,56 +1495,78 @@
             document.getElementById('remainingBalance').value = '';
         });
 
-        // ============ FIXED AUTHENTICATION ============
-        let isInitializing = true;
+// ============ FIXED AUTHENTICATION ============
+let isInitializing = true;
 
-        async function initializeApp() {
-            // Disable login button while initializing
-            const loginBtn = document.getElementById('loginBtn');
-            loginBtn.disabled = true;
-            loginBtn.textContent = 'Initializing...';
-            
-            const configLoaded = await loadConfig();
-            if (!configLoaded || !CONFIG) {
-                console.error('Failed to load config');
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'Sign in with Google';
-                return;
-            }
-            
-            gapi.load('client', async () => {
-                await gapi.client.init({ 
-                    apiKey: CONFIG.API_KEY, 
-                    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'] 
-                });
-                
-                tokenClient = google.accounts.oauth2.initTokenClient({
-                    client_id: CONFIG.CLIENT_ID,
-                    scope: CONFIG.SCOPES,
-                    callback: async (tokenResponse) => {
-                        if (tokenResponse.access_token) {
-                            gapi.client.setToken({ access_token: tokenResponse.access_token });
-                            isAuthenticated = true;
-                            recordSuccessfulAttempt();
-                            document.getElementById('authContainer').classList.add('hidden');
-                            document.getElementById('appContainer').classList.remove('hidden');
-                            document.querySelectorAll('.nav-item').forEach(btn => btn.onclick = () => switchTab(btn.getAttribute('data-tab')));
-                            await loadAllData();
-                            switchTab('dashboard');
-                            showAlert('Successfully connected to Google Sheets', 'success');
-                        } else {
-                            recordFailedAttempt();
-                            document.getElementById('errorMessage').innerText = 'Authentication failed. Please try again.';
-                        }
-                    }
-                });
-                
-                // Re-enable login button after initialization
-                isInitializing = false;
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'Sign in with Google';
-            });
+async function initializeApp() {
+    // Disable login button while initializing
+    const loginBtn = document.getElementById('loginBtn');
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Initializing...';
+    
+    // Set a timeout to re-enable button if something goes wrong
+    const timeoutId = setTimeout(() => {
+        if (isInitializing) {
+            console.error('Initialization timeout');
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Sign in with Google';
+            isInitializing = false;
+            document.getElementById('errorMessage').innerText = 'Initialization timeout. Please refresh the page.';
         }
+    }, 10000);
+    
+    const configLoaded = await loadConfig();
+    if (!configLoaded || !CONFIG) {
+        console.error('Failed to load config');
+        clearTimeout(timeoutId);
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Sign in with Google';
+        isInitializing = false;
+        return;
+    }
+    
+    // Load Google API
+    gapi.load('client', () => {
+        clearTimeout(timeoutId);
+        
+        gapi.client.init({ 
+            apiKey: CONFIG.API_KEY, 
+            discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'] 
+        }).then(() => {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CONFIG.CLIENT_ID,
+                scope: CONFIG.SCOPES,
+                callback: async (tokenResponse) => {
+                    if (tokenResponse.access_token) {
+                        gapi.client.setToken({ access_token: tokenResponse.access_token });
+                        isAuthenticated = true;
+                        recordSuccessfulAttempt();
+                        document.getElementById('authContainer').classList.add('hidden');
+                        document.getElementById('appContainer').classList.remove('hidden');
+                        document.querySelectorAll('.nav-item').forEach(btn => btn.onclick = () => switchTab(btn.getAttribute('data-tab')));
+                        await loadAllData();
+                        switchTab('dashboard');
+                        showAlert('Successfully connected to Google Sheets', 'success');
+                    } else {
+                        recordFailedAttempt();
+                        document.getElementById('errorMessage').innerText = 'Authentication failed. Please try again.';
+                    }
+                }
+            });
+            
+            // Re-enable login button after initialization
+            isInitializing = false;
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Sign in with Google';
+        }).catch(err => {
+            console.error('gapi.client.init error:', err);
+            document.getElementById('errorMessage').innerText = 'Failed to initialize Google API: ' + err.message;
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Sign in with Google';
+            isInitializing = false;
+        });
+    });
+}
 
                document.getElementById('loginBtn')?.addEventListener('click', () => {
             // Don't allow clicking if still initializing
