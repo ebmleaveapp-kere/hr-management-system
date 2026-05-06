@@ -1,14 +1,9 @@
 {
   "version": 2,
-  "functions": {
-    "api/config.js": {
-      "runtime": "edge"
-    }
-  },
   "routes": [
     {
-      "src": "/api/config.js",
-      "dest": "/api/config.js"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
     },
     {
       "src": "/(.*)",
