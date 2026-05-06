@@ -1707,16 +1707,32 @@
             document.getElementById('appContainer').classList.add('hidden');
         });
 
-        // Initialize - wait for config first
-        (async function init() {
-            const configLoaded = await loadConfig();
-            if (configLoaded && CONFIG) {
-                gapi.load('client', async () => {
-                    await initializeGapiClient();
-                    initializeGisClient();
-                });
+        // Initialize directly (no config loading needed)
+gapi.load('client', async () => {
+    await gapi.client.init({ 
+        apiKey: CONFIG.API_KEY, 
+        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'] 
+    });
+    
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CONFIG.CLIENT_ID,
+        scope: CONFIG.SCOPES,
+        callback: async (tokenResponse) => {
+            if (tokenResponse.access_token) {
+                gapi.client.setToken({ access_token: tokenResponse.access_token });
+                isAuthenticated = true;
+                document.getElementById('authContainer').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                document.querySelectorAll('.nav-item').forEach(btn => btn.onclick = () => switchTab(btn.getAttribute('data-tab')));
+                await loadAllData();
+                switchTab('dashboard');
+                showAlert('Successfully connected to Google Sheets', 'success');
+            } else {
+                document.getElementById('errorMessage').innerText = 'Authentication failed. Please try again.';
             }
-        })();
+        }
+    });
+});
     </script>
 
 
