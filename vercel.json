@@ -1,10 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/config.js": {
-      "runtime": "edge"
-    }
-  },
   "routes": [
     {
       "src": "/api/config.js",
