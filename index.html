@@ -775,25 +775,25 @@
 
     <script>
 
-        // ============ CONFIGURATION LOADER ============
-        let CONFIG = null;
+// ============ CONFIGURATION LOADER ============
+let CONFIG = null;
 
-        async function loadConfig() {
-            try {
-                const response = await fetch('/api/config');
-                if (!response.ok) {
-                    throw new Error('Failed to load configuration');
-                }
-                CONFIG = await response.json();
-                console.log('Configuration loaded successfully');
-                return true;
-            } catch (error) {
-                console.error('Error loading config:', error);
-                const errorDiv = document.getElementById('errorMessage');
-                if (errorDiv) errorDiv.innerText = 'Failed to load configuration. Please refresh the page.';
-                return false;
-            }
+async function loadConfig() {
+    try {
+        const response = await fetch('/api/config.js');
+        if (!response.ok) {
+            throw new Error('Failed to load configuration');
         }
+        CONFIG = await response.json();
+        console.log('Configuration loaded successfully');
+        return true;
+    } catch (error) {
+        console.error('Error loading config:', error);
+        const errorDiv = document.getElementById('errorMessage');
+        if (errorDiv) errorDiv.innerText = 'Failed to load configuration. Please refresh the page.';
+        return false;
+    }
+}
 
         let tokenClient = null;
         let isAuthenticated = false;
